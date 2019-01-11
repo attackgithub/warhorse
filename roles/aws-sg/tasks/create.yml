@@ -1,0 +1,34 @@
+---
+# roles/aws-sg/tasks/create.yml
+
+- name: Create security groups
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  ec2_group:
+    name: "{{ security_group_name }}"
+    description: "Security group for the {{ security_group_name }}"
+    vpc_id: "{{ vpc_net_facts.vpcs[0].id }}"
+    region: "{{ aws_region }}"
+    state: "present"
+    purge_rules: "false"
+    rules:
+      - proto: tcp
+        from_port: 22
+        to_port: 22
+        cidr_ip: '{{ allowed_ips }}'
+    rules_egress:
+      - proto: all
+        cidr_ip: 0.0.0.0/0
+    rules_egress:
+      - proto: 'all'
+        cidr_ip: '0.0.0.0/0'
+  register: sg
+
+# - name: set fact security_group_name
+#   set_fact:
+#     security_group_name: "{{ sg.results.0.invocation.module_args.name }}"
+
+# - name: set fact security_group_id
+#   set_fact:
+#     security_group_id: "{{ sg.results.0.group_id }}"

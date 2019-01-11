@@ -1,0 +1,54 @@
+---
+# playbooks/setup-vm.yml
+- name: Build Inventory
+  hosts: 'localhost'
+  gather_facts: yes
+  roles:
+    - { role: aws-inventory }
+
+- name: Install Python
+  hosts: 'warhorse-box'
+  gather_facts: no
+  tasks:
+    - name: 'install python'
+      raw: 'sudo apt-get -y install python'
+  tags:
+    - setup-vm
+    - setup-vm:install_python
+
+- name: Setup Security and Docker
+  gather_facts: yes
+  hosts: "warhorse-box"
+  become: yes
+  roles:
+    - { role: geerlingguy.security, tags: ['setup-vm','setup-vm:install_security'] }
+    - { role: geerlingguy.pip, tags: ['setup-vm','setup-vm:install_pip']  }
+    - { role: geerlingguy.docker, tags: ['setup-vm','setup-vm:install_docker'] }
+
+- name: Install Docker Extra's and Update System
+  gather_facts: True
+  hosts: 'warhorse-box'
+  become: yes
+  tasks:
+    - name: Install Pip Docker
+      pip:
+        name: docker
+      tags:
+        - setup-vm
+        - setup-vm:docker_pip
+    - name: Containers internal network RAW
+      raw: 'docker network list | grep -q "{{ docker_network }}" || docker network create "{{ docker_network }}"'
+    ## This should work but does not.
+    # - name: Containers internal network
+    #   docker_network:
+    #     name: '{{ docker_network }}'
+    #     state: present
+      tags:
+        - setup-vm
+        - setup-vm:docker_network
+    - name: upgrade packages
+      apt: upgrade=yes update_cache=yes cache_valid_time=300
+      tags:
+        - setup-vm
+        - setup-vm:upgrade_os
+

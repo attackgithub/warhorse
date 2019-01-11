@@ -1,0 +1,28 @@
+---
+- name: Gather VPC NET Facts
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  ec2_vpc_net_facts:
+    filters:
+      "tag:Name": "{{hostname}}-vpc"
+  register: vpc_net_facts
+  when: vpc_net_facts is not defined
+
+- name: AWS Security Group for Cobalt Strike
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  ec2_group:
+    name: "{{ security_group_name }}"
+    description: "Security group for the {{ security_group_name }}"
+    vpc_id: "{{ vpc_net_facts.vpcs[0].id }}"
+    region: "{{ aws_region }}"
+    state: present
+    purge_rules: "false"
+    rules:
+      - proto: tcp
+        from_port: 50050
+        to_port: 50050
+        # the containing group name may be specified here
+        cidr_ip: "{{ allowed_ips }}"

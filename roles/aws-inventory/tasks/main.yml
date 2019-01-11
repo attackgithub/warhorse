@@ -1,0 +1,6 @@
+---
+# roles/aws-inventory/tasks/main.yml
+
+- include: ec2_hosts.yml
+  # when: current_instance is undefined
+  tags: always

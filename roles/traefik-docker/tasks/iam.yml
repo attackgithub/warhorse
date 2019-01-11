@@ -1,0 +1,71 @@
+---
+- name: Create dnsChallenge policy from template
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  iam_managed_policy:
+    policy_name: "dnsChallenge"
+    policy_description: "DNS Chanllenge managed policy"
+    policy: "{{ lookup('file', 'files/dnsChallenge.json') }}"
+    state: present
+  register: policy_creation
+
+- name: Check for existence of IAM users
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  iam:
+    iam_type: user
+    name: "{{ item }}"
+    state: "update"
+  with_items:
+    - dnsChallenge_user
+  register: user_creation
+  ignore_errors: yes
+
+- name: Run CLI to Detach policy
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  shell: "aws iam detach-user-policy --user-name dnsChallenge_user --policy-arn {{ policy_creation.policy.arn }}"
+  when: (user_creation is success and vault_traefik_file.stat.exists == false)
+
+- name: Delete IAM users
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  iam:
+    iam_type: user
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - dnsChallenge_user
+  when: (user_creation is success and vault_traefik_file.stat.exists == false)
+
+- name: Create IAM users
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  iam:
+    iam_type: user
+    name: "{{ item }}"
+    state: present
+    password: "{{ vault_dnsChallenge_user_password }}"
+    access_key_state: create
+  with_items:
+    - dnsChallenge_user
+  register: dnsChallenge_user
+  when: (user_creation is failed or vault_traefik_file.stat.exists == false)
+
+- name: Add IAM API keys to vault
+  set_fact:
+      vault_dnsChallenge_user_access_key_id: "{{ dnsChallenge_user.results[0].user_meta.access_keys[0].access_key_id }}"
+      vault_dnsChallenge_user_secret_access_key: "{{ dnsChallenge_user.results[0].user_meta.access_keys[0].secret_access_key}}"
+  when: (user_creation is failed or vault_traefik_file.stat.exists == false)
+
+- name: Run CLI to Attach policy
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  shell: "aws iam attach-user-policy --user-name dnsChallenge_user --policy-arn {{ policy_creation.policy.arn }}"
+  when: (user_creation is failed or vault_traefik_file.stat.exists == false)

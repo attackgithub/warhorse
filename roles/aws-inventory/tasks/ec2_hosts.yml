@@ -1,0 +1,20 @@
+---
+- name: Gather hosts matching tags.
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  ec2_instance_facts:
+    filters:
+      instance-state-name: running
+      "tag:Name": "{{ instance_name }}"
+    region: "{{ aws_region }}"
+  register: current_instance
+
+- name: Add EC2 Hosts
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  add_host:
+    name: "{{ current_instance.instances[0].public_dns_name }}"
+    groups: "{{ hostname }}"
+    ec2_id: "{{ current_instance.instances[0].instance_id }}"

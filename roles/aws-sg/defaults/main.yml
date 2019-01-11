@@ -1,0 +1,4 @@
+---
+# defaults file for aws-security-groups
+state: present
+sg_settings: {}

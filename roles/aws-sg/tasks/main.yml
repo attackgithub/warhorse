@@ -1,0 +1,20 @@
+---
+# roles/aws-sg/tasks/main.yml
+
+- include: facts.yml
+  tags:
+    - aws-sg
+    - aws-sg:create
+    - aws-sg:destroy
+  when: vpc_net_facts is undefined
+
+- include: create.yml
+  tags:
+    - aws-sg
+    - aws-sg:create
+
+- include: destroy.yml
+  tags:
+    - never
+    - destroy
+    - aws-sg:destroy

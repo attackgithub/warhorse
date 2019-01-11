@@ -1,0 +1,11 @@
+---
+- name: WatchTower
+  docker_container:
+    name: watchtower
+    image: v2tec/watchtower:latest
+    state: started
+    restart_policy: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /etc/localtime:/etc/localtime:ro
+    command: --schedule "0 0 5 * * 6" --cleanup

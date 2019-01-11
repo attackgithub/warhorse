@@ -1,0 +1,5 @@
+#!/usr/bin/env ansible-playbook
+
+- import_playbook: playbooks/setup-cloud.yml
+- import_playbook: playbooks/setup-vm.yml
+- import_playbook: playbooks/containers.yml

@@ -1,0 +1,20 @@
+---
+# roles/aws-ec2/tasks/facts.yml
+- name: Gather VPC NET Facts
+  ec2_vpc_net_facts:
+    filters:
+      "tag:Name": "{{hostname}}-vpc"
+  register: vpc_net_facts
+
+- name: Gather VPC Subnet Facts
+  ec2_vpc_subnet_facts:
+    filters:
+      vpc-id: '{{ vpc_net_facts.vpcs[0].id }}'
+      "tag:Name": "Public Subnet"
+  register: vpc_subnet_facts
+
+- name: Gather AMI Facts
+  ec2_ami_facts:
+    filters:
+      "tag:Name": 'Ubuntu-Encrypted-AMI'
+  register: ami_facts

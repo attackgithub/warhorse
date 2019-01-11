@@ -1,0 +1,56 @@
+---
+- name: check if ssh file exists
+  stat: 
+    path: "{{ playbook_dir }}/files/ssh/ssh-key"
+  register: ssh_file
+
+- name: delete ec2 key pair on AWS
+  ec2_key:
+    name: "{{ keypair }}"
+    state: absent
+  when: (ssh_file.stat.exists == false)
+
+# - name: delete ec2 key pair on disk
+#   file:
+#     state: absent
+#     path: "{{ playbook_dir }}/files/ssh/ssh-key"
+#   when: (ssh_file.stat.exists == true)
+
+- name: create a new ec2 key pair
+  ec2_key:
+    name: "{{ keypair }}"
+    force: true
+  register: ec2_keypair
+  when: (ssh_file.stat.exists == false)
+
+- name: Set SSH key from AWS
+  set_fact:
+      vault_ssh_key_private: "{{ ec2_keypair.key.private_key }}"
+  when: (ssh_file.stat.exists == false)
+
+- name: read current sshkey
+  shell: ansible-vault view  --vault-id {{vault_password_file}} {{ playbook_dir }}/files/ssh/ssh-key
+  register: ec2_keypair
+  when: (ssh_file.stat.exists == true)
+
+- name: Set SSH key from disk
+  set_fact:
+      vault_ssh_key_private: "{{ ec2_keypair.stdout }}"
+  when: (ssh_file.stat.exists == true)
+
+- name: Create sshkey file
+  template:
+    src: "ssh-key.j2"
+    dest: "{{ playbook_dir }}/files/ssh/ssh-key"
+    mode: 0600
+  delegate_to: localhost
+  when: (ssh_file.stat.exists == false)
+
+- name: Encrypt sshkey
+  shell: "ansible-vault encrypt --vault-id {{vault_password_file}} {{ playbook_dir }}/files/ssh/ssh-key"
+  delegate_to: localhost
+  when: (ssh_file.stat.exists == false)
+
+- name: add private ssh key to ssh-agent
+  shell: "ansible-vault view --vault-id {{vault_password_file}} {{ playbook_dir }}/files/ssh/ssh-key | ssh-add -"
+  changed_when: false # this could be improved.

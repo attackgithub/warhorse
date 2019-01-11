@@ -1,0 +1,10 @@
+---
+# roles/traefik-docker/tasks/facts.yml
+- name: Gather VPC NET Facts
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  ec2_vpc_net_facts:
+    filters:
+      "tag:Name": "{{hostname}}-vpc"
+  register: vpc_net_facts

@@ -1,0 +1,17 @@
+---
+# roles/aws-ec2/tasks/main.yml
+
+- include: facts.yml
+  tags:
+    - aws-ec2:create
+    - aws-ec2:facts
+
+- include: create.yml
+  tags:
+    - aws-ec2:create
+
+- include: destroy.yml
+  tags:
+    - never
+    - destroy
+    - aws-ec2:destroy

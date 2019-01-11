@@ -1,0 +1,50 @@
+---
+# roles/backup-docker/tasks/main.yml
+
+- name: check if vault file exists
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  stat: 
+    path: '{{ role_path }}/vars/vault.yml'
+  register: vault_backup_file
+  tags:
+    - backup-docker
+
+- name: Include Vault Vars
+  include_vars: "vault.yml"
+  when: (vault_backup_file.stat.exists == true)
+  tags:
+    - backup-docker
+
+- name: Create Passwords
+  include: create-passwords.yml
+  when: (vault_backup_file.stat.exists == false)
+  tags:
+    - backup-docker
+    - backup-docker:create-passwords
+
+- name: Creat IAM accounts
+  include: iam.yml
+  tags:
+    - backup-docker
+    - backup-docker:iam
+
+- name: Write Vault
+  include: vault-write.yml
+  when: (vault_backup_file.stat.exists == false)
+  tags:
+    - backup-docker
+    - backup-docker:vault-write
+
+- name: Create Continer
+  include: create.yml
+  tags:
+     - backup-docker
+     - backup-docker:create
+
+- name: Destroy Container
+  include: destroy.yml
+  tags:
+    - never
+    - backup-docker:destroy

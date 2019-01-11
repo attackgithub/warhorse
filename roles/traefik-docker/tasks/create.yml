@@ -1,0 +1,45 @@
+---
+- name: Ensures traefik dir exists
+  file:
+    path: '{{ traefik_dir }}'
+    state: directory
+
+- name: Adding traefik.toml file
+  template:
+    src: traefik.toml.j2
+    dest: '{{ traefik_dir }}/traefik.toml'
+    mode: 0600
+
+- name: Adding acme.json file
+  template:
+    src: acme.json.j2
+    dest: "{{ traefik_dir }}/acme.json"
+    mode: 0600
+
+- name: Create the traefik container
+  docker_container:
+    name: traefik
+    image: traefik:alpine
+    state: started
+    pull: "yes"
+    restart_policy: unless-stopped
+    env: 
+      AWS_ACCESS_KEY_ID: "{{ vault_dnsChallenge_user_access_key_id }}"
+      AWS_SECRET_ACCESS_KEY: "{{ vault_dnsChallenge_user_secret_access_key }}"
+    networks:
+      - name: "{{ docker_network }}"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "{{ traefik_dir }}/traefik.toml:/etc/traefik/traefik.toml"
+      - "{{ traefik_dir }}/traefik.log:/etc/traefik/traefik.log"
+      - "{{ traefik_dir }}/access.log:/etc/traefik/access.log"
+      - "{{ traefik_dir }}/acme.json:/etc/traefik/acme.json"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    labels:
+      traefik.frontend.rule: "Host:traefik.{{ route53_domian_name }}"
+      traefik.frontend.whiteList.sourceRange: "{{ traefik_allowed_ips }}"
+      traefik.docker.network: "{{ docker_network }}"
+      traefik.port: "8080"
+      traefik.enable: "true"

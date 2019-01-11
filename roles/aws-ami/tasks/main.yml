@@ -1,0 +1,12 @@
+---
+# roles/aws-ami/tasks/main.yml
+
+- include: create.yml
+  tags:
+    - aws-ami:create
+
+- include: destroy.yml
+  tags:
+    - never
+    - destroy
+    - aws-ami:destroy

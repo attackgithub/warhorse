@@ -1,0 +1,42 @@
+---
+- name: Ensures cobaltstrike dir exists
+  file:
+    path: "{{ cs_dir }}"
+    state: directory
+
+- name: Ensures cobaltstrike dir exists
+  file:
+    path: "{{ cs_dir }}/profiles"
+    state: directory
+
+- name: Adding profile file
+  template:
+    src: "{{cs_profile}}.profile.j2"
+    dest: "{{ cs_dir }}/profiles/{{cs_profile}}.profile"
+    mode: 0600
+
+- name: Cobaltstrike
+  docker_container:
+    name: cobaltstrike
+    image: warhorse/docker-cobaltstrike:latest
+    pull: yes
+    state: started
+    hostname: cobaltstrike
+    restart_policy: always
+    ports:
+    - "50050:50050"
+    volumes:
+     - "{{ cs_dir }}:/opt/cobaltstrike"
+    env:
+      COBALTSTRIKE_KEY: '{{ vault_cs_key }}'
+      COBALTSTRIKE_PASS: '{{ vault_cs_password }}'
+      COBALTSTRIKE_EXP: '{{ cs_exp_date }}'
+      COBALTSTRIKE_PROFILE: '{{ cs_profile }}'
+    networks:
+      - name: '{{ docker_network }}'
+    labels:
+      traefik.docker.network: '{{ docker_network }}'
+      traefik.protocol: 'https'
+      traefik.enable: 'true'
+      traefik.frontend.rule: 'Host:{{cs_hostname}}.{{ route53_domian_name }}'
+      traefik.port: '443'

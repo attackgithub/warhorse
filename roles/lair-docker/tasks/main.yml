@@ -1,0 +1,51 @@
+---
+# roles/lair-docker/tasks/main.yml
+
+- name: check if vault file exists
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  stat: 
+    path: '{{ role_path }}/vars/vault.yml'
+  register: vault_lair_file
+  tags:
+    - lair-docker
+
+- name: Include Vault Vars
+  include_vars: "vault.yml"
+  when: (vault_lair_file.stat.exists == true)
+  tags:
+    - lair-docker
+
+- name: Create Passwords
+  include: create-passwords.yml
+  when: (vault_lair_file.stat.exists == false)
+  tags:
+    - lair-docker
+    - lair-docker:create-passwords
+
+- name: Write Vault
+  include: vault-write.yml
+  when: (vault_lair_file.stat.exists == false)
+  tags:
+    - lair-docker
+    - lair-docker:vault-write
+
+- name: Create DNS Entry
+  include: dns.yml
+  tags:
+     - lair-docker
+     - lair-docker:dns
+
+
+- name: Create Continer
+  include: create.yml
+  tags:
+     - lair-docker
+     - lair-docker:create
+
+- name: Destroy Container
+  include: destroy.yml
+  tags:
+    - never
+    - lair-docker:destroy

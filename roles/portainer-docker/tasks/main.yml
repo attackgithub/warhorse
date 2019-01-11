@@ -1,0 +1,47 @@
+- name: check if vault file exists
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  stat: 
+    path: '{{ role_path }}/vars/vault.yml'
+  register: vault_portainer_file
+  tags:
+    - portainer-docker
+
+- name: Include Vault Vars
+  include_vars: "vault.yml"
+  when: (vault_portainer_file.stat.exists == true)
+  tags:
+    - portainer-docker
+
+- name: Create Passwords
+  include: create-passwords.yml
+  when: (vault_portainer_file.stat.exists == false)
+  tags:
+    - portainer-docker
+    - portainer-docker:create-passwords
+
+- name: Write Vault
+  include: vault-write.yml
+  when: (vault_portainer_file.stat.exists == false)
+  tags:
+    - portainer-docker
+    - portainer-docker:vault-write
+
+- name: Create DNS Entry
+  include: dns.yml
+  tags:
+     - portainer-docker
+     - portainer-docker:dns
+
+- name: Create Continer
+  include: create.yml
+  tags:
+     - portainer-docker
+     - portainer-docker:create
+
+- name: Destroy Container
+  include: destroy.yml
+  tags:
+    - never
+    - portainer-docker:destroy

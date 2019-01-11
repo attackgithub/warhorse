@@ -1,0 +1,15 @@
+---
+# playbooks/containers.yml
+- name: Install Containers
+  gather_facts: yes
+  hosts: "warhorse-box"
+  become: yes
+  roles:
+    - { role: aws-inventory }
+    - { role: traefik-docker } ## This container is REQUIRED!!
+    - { role: portainer-docker }
+    - { role: watchtower-docker }
+    # - { role: backup-docker }
+    - { role: netdata-docker }
+    - { role: lair-docker }
+    - { role: cobaltstrike-docker }

@@ -1,0 +1,13 @@
+---
+- name: Create Encrypted AMI
+  ec2_ami_copy:
+    source_region: "{{ aws_region }}"
+    region: "{{ aws_region }}"
+    name: 'Ubuntu-Encrypted-AMI'
+    source_image_id: "{{ ami_id }}"
+    encrypted: yes
+    tags:
+      Name: 'Ubuntu-Encrypted-AMI'
+    tag_equality: yes
+    wait: yes
+  register: encrypted_ami

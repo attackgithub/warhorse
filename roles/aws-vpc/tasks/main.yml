@@ -1,0 +1,12 @@
+---
+# roles/aws-vpc/tasks/main.yml
+
+- include: create.yml
+  tags:
+    - aws-vpc:create
+
+- include: destroy.yml
+  tags:
+    - never
+    - destroy
+    - aws-vpc:destroy

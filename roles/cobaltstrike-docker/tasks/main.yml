@@ -1,0 +1,64 @@
+---
+# roles/cobaltstrike-docker/tasks/main.yml
+
+- name: check if vault file exists
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  stat: 
+    path: '{{ role_path }}/vars/vault.yml'
+  register: vault_cobaltstrike_file
+  tags:
+    - cobaltstrike-docker
+
+- name: Include Vault Vars
+  include_vars: "vault.yml"
+  when: (vault_cobaltstrike_file.stat.exists == true)
+  tags:
+    - cobaltstrike-docker
+
+- pause:
+      prompt: "What is your Cobalt Strike License?"
+  when: (vault_cs_key is not defined )
+  register: vault_cs_key
+  no_log: true
+  tags:
+    - cobaltstrike-docker
+
+- name: Create Passwords
+  include: create-passwords.yml
+  when: (vault_cobaltstrike_file.stat.exists == false)
+  tags:
+    - cobaltstrike-docker
+    - cobaltstrike-docker:create-passwords
+
+- name: Create Security Group
+  include: sg.yml
+  tags:
+    - cobaltstrike-docker
+    - cobaltstrike-docker:sg
+
+- name: Write Vault
+  include: vault-write.yml
+  when: (vault_cobaltstrike_file.stat.exists == false)
+  tags:
+    - cobaltstrike-docker
+    - cobaltstrike-docker:vault-write
+
+- name: Create DNS Entry
+  include: dns.yml
+  tags:
+     - cobaltstrike-docker
+     - cobaltstrike-docker:dns
+
+- name: Create Continer
+  include: create.yml
+  tags:
+     - cobaltstrike-docker
+     - cobaltstrike-docker:create
+
+- name: Destroy Container
+  include: destroy.yml
+  tags:
+    - never
+    - cobaltstrike-docker:destroy

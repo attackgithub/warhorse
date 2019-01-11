@@ -1,0 +1,91 @@
+---
+# vars/all.yml
+
+allowed_ips: '1.1.1.1/32'
+
+vault_password_file: ~/.vault_pass
+vault_force_new_password: false
+ansible_user: ubuntu
+
+##
+# General Playbook
+##
+
+hostname: 'warhorse-box'
+modify_containers_only: false
+cloud_provider: 'aws'
+
+##
+# EC2 Specific variables
+##
+
+aws_region: us-east-1
+ami_owner: 099720109477
+ami_id: ami-0ac019f4fcb7cb7e6
+instance_type: t2.medium
+encrypt_ami_source_ami_search_owner: '{{ ami_owner }}'
+encrypt_ami_source_ami_id: '{{ ami_id }}'
+instance_name: '{{hostname}}'
+
+volumes:
+  - device_name: /dev/sda1
+    device_type: gp2
+    volume_size: 20
+    delete_on_termination: true
+
+keypair: '{{hostname}}-ssh'
+security_group_name: 'warhorse-sg'
+security_group_ssh_ip: '{{allowed_ips}}'
+
+# VPC Information
+vpc_name:       "{{hostname}}-vpc"
+vpc_cidr_block: "10.0.0.0/16"
+public_subnet_1_cidr:  "10.0.0.0/24"
+private_subnet_1_cidr: "10.0.1.0/24"
+public_subnet_2_cidr:  "10.0.10.0/24"
+private_subnet_2_cidr: "10.0.11.0/24"
+
+
+##
+# Route53 Specific variables
+##
+
+route53_domian_name: 'yourdomain.com'
+
+##
+# Docker Specific variables
+##
+docker_network: 'attack'
+
+##
+# Traefik Specific variables
+##
+traefik_dir: '/var/www/traefik'
+traefik_tls_src_files: './files'
+traefik_user: 'admin'
+traefik_lets_encypt_email: 'my@email.com'
+traefik_allowed_ips: '{{allowed_ips}}'
+traefik_hostname: 'traefik'
+
+##
+# Docker Contianer variables
+##
+
+# netdata
+netdata_user: 'netdata'
+netdata_uid: '995'
+metrics_basicauth_user: 'admin'
+netdata_hostname: 'netdata'
+
+# lair
+lair_dir: '/etc/lair'
+lair_hostname: 'lair'
+
+#Cobalt Strike
+cs_hostname: 'cs'
+cs_dir: '/etc/cobaltstrike'
+cs_profile: 'malleable'
+cs_exp_date: '2019-12-12'
+
+# Portainer
+portainer_hostname: 'portainer'

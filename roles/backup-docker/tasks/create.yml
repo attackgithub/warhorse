@@ -1,0 +1,33 @@
+---
+# roles/backup-docker/tasks/create.yml
+- name: Ensures lair dir exists
+  file:
+    path: "{{ backup_dir }}"
+    state: directory
+
+- name: Backup rclone
+  docker_container:
+    name: rclone
+    image: bcardiff/rclone:latest
+    pull: yes
+    state: started
+    hostname: rclone
+    restart_policy: always
+    env:
+      LAIR_PASSWORD: "{{ vault_lair_password }}"
+    networks:
+      - name: "{{ docker_network }}"
+
+- name: Backup borg
+  docker_container:
+    name: borg
+    image: pschiffe/borg:latest
+    pull: yes
+    state: started
+    hostname: borg
+    restart_policy: always
+    volumes:
+      - "{{lair_dir}}/plugins:/plugins"
+      - "{{lair_dir}}/files:/files"
+    networks:
+      - name: "{{ docker_network }}"

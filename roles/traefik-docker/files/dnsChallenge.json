@@ -1,0 +1,43 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+        "Sid": "",
+        "Effect": "Allow",
+        "Action": [
+            "route53:ChangeResourceRecordSets",
+            "route53:GetChange",
+            "route53:GetChangeDetails",
+            "route53:ListHostedZones",
+            "route53:ListHostedZonesByName",
+            "route53:ListResourceRecordSets"
+            ],
+        "Resource": [
+            "*"
+        ]
+        },
+        {
+        "Sid": "",
+        "Effect": "Allow",
+        "Action": [
+            "elasticloadbalancing:DescribeLoadBalancers",
+            "elasticloadbalancing:SetLoadBalancerListenerSSLCertificate"
+        ],
+        "Resource": [
+            "*"
+        ]
+        },
+        {
+        "Sid": "",
+        "Effect": "Allow",
+        "Action": [
+            "iam:ListServerCertificates",
+            "iam:GetServerCertificate",
+            "iam:UploadServerCertificate"
+        ],
+        "Resource": [
+            "*"
+        ]
+        }
+    ]
+}

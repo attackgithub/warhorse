@@ -1,0 +1,12 @@
+---
+- name: Gather facts about AMI
+  ec2_ami_facts:
+    filters:
+      "tag:Name": Ubuntu-Encrypted-AMI
+  register: encrypted_ami
+
+- name: Destroy Encrypted AMI
+  ec2_ami:
+    image_id: "{{ encrypted_ami.image_id }}"
+    delete_snapshot: True
+    state: absent

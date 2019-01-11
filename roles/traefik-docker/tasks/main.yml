@@ -1,0 +1,63 @@
+---
+# roles/traefik-docker/tasks/main.yml
+
+- name: check if vault file exists
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  stat: 
+    path: '{{ role_path }}/vars/vault.yml'
+  register: vault_traefik_file
+  tags:
+    - traefik-docker
+
+- name: Include Vault Vars
+  include_vars: "vault.yml"
+  when: (vault_traefik_file.stat.exists == true)
+  tags:
+    - traefik-docker
+
+- name: Create Passwords
+  include: create-passwords.yml
+  when: (vault_traefik_file.stat.exists == false)
+  tags:
+    - traefik-docker
+    - traefik-docker:create-passwords
+
+- name: Create Security Group
+  include: sg.yml
+  tags:
+    - traefik-docker
+    - traefik-docker:sg
+
+- name: Creat IAM accounts
+  include: iam.yml
+  tags:
+    - traefik-docker
+    - traefik-docker:iam
+
+- name: Write Vault
+  include: vault-write.yml
+  when: (vault_traefik_file.stat.exists == false)
+  tags:
+    - traefik-docker
+    - traefik-docker:vault-write
+
+- name: Create DNS Entry
+  include: dns.yml
+  tags:
+     - traefik-docker
+     - traefik-docker:dns
+
+- name: Create Continer
+  include: create.yml
+  tags:
+     - traefik-docker
+     - traefik-docker:create
+
+- name: Destroy Container
+  include: destroy.yml
+  tags:
+    - never
+    - traefik-docker:destroy
+

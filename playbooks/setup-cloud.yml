@@ -1,0 +1,12 @@
+---
+# playbooks/setup-cloud.yml
+- name: Setup Cloud
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  roles:
+     - { role: aws-vpc }
+     - { role: aws-sg }
+     - { role: aws-ami }
+     - { role: aws-ssh-key }
+     - { role: aws-ec2 }

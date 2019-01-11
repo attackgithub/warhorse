@@ -1,0 +1,66 @@
+---
+- name: Ensures lair dir exists
+  file:
+    path: "{{ lair_dir }}"
+    state: directory
+
+- name: Adding plugin files
+  copy:
+    src: "{{ item }}"
+    dest: "{{lair_dir}}/plugins"
+    owner: root
+    mode: 600
+  with_fileglob:
+    - "{{ role_path }}/files/plugins/*"
+
+- name: Lair
+  docker_container:
+    name: lair_lair
+    image: warhorse/docker-lair-app:latest
+    pull: yes
+    state: started
+    hostname: lair
+    restart_policy: always
+    env:
+      LAIR_PASSWORD: "{{ vault_lair_password }}"
+    networks:
+      - name: "{{ docker_network }}"
+    labels:
+      traefik.docker.network: "{{ docker_network }}"
+      traefik.enable: "true"
+      traefik.basic.frontend.rule: "Host:lair.{{ route53_domian_name }}"
+      traefik.basic.port: "11014"
+
+- name: Lair API
+  docker_container:
+    name: lairapi
+    image: warhorse/docker-lair-api:latest
+    pull: yes
+    state: started
+    hostname: lairapi
+    restart_policy: always
+    volumes:
+      - "{{lair_dir}}/plugins:/plugins"
+      - "{{lair_dir}}/files:/files"
+    networks:
+      - name: "{{ docker_network }}"
+    labels:
+      traefik.docker.network: "{{ docker_network }}"
+      traefik.enable: "true"
+      traefik.basic.frontend.rule: "Host:lair.{{ route53_domian_name }};PathPrefix:/api"
+      traefik.basic.port: "11015"
+
+- name: Lair DB
+  docker_container:
+    name: lairdb
+    image: mongo:3.6.1
+    pull: yes
+    state: started
+    hostname: lairdb
+    restart_policy: always
+    command: "/usr/bin/mongod --bind_ip_all --dbpath=/data/db --replSet rs0 --logpath /var/log/mongodb.log --logappend"
+    volumes:
+      - "{{lair_dir}}/mongodb/data/db:/data/db"
+      - "{{lair_dir}}/mongodb/var/log:/var/log"
+    networks:
+      - name: "{{ docker_network }}"

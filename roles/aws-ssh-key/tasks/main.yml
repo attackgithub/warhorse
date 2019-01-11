@@ -1,0 +1,12 @@
+---
+# roles/aws-ssh-key/tasks/main.yml
+
+- include: create.yml
+  tags:
+    - aws-ssh-key:create
+
+- include: destroy.yml
+  tags:
+    - never
+    - destroy
+    - aws-ssh-key:destroy
