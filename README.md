@@ -1,4 +1,8 @@
-# Warhorse - Red Team Attack Infrastructure Automation
+
+
+![Warhorse Logo](https://github.com/war-horse/war-horse.io/raw/master/img/logo.png)
+
+## Red Team Attack Infrastructure Automation
 
 ## CURRENT STATUS - BETA
 
@@ -129,7 +133,7 @@ ansible-playbook -i inventory/hosts destroy.yml --vault-password-file ~/.vault_p
 To just remove for example cobaltstrike-docker you could run the following
 
 ```bash
-ansible-playbook -i inventory/hosts destroy.yml --vault-password-file ~/.vault_pass --tags cobaltstrike-docker
+ansible-playbook -i inventory/hosts destroy.yml --vault-password-file ~/.vault_pass --tags cobaltstrike-docker::destroy
 ```
 
 ## What's Next?
