@@ -134,7 +134,11 @@ ansible-playbook -i inventory/hosts destroy.yml --vault-password-file ~/.vault_p
 
 ## What's Next?
 
+<<<<<<< HEAD
 This project is rapidly evolving. I have plans to continue active development and will utilize during my own engagements and modify and improve when necessary. I will be created better documentation as this project stabilizes. This playbook may not work at all feel free to make push request. 
+=======
+This project is rapidly evolving. I have plans to continue active devlopment and will utlize during my own engagments and modify and impove when necessary. I will be creating better documentation as this project stabilizes. This playbook may not work at all feel free to make push request. 
+>>>>>>> a556b84a1ee48791939f7a76ca054ecaf4643779
     
 
 ## Dependencies
