@@ -1,0 +1,7 @@
+---
+# roles/watchtower-docker/tasks/destroy-container.yml
+
+- name: Destroy Cobaltstrike
+  docker_container:
+    name: watchtower
+    state: absent

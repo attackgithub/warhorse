@@ -1,8 +1,13 @@
 ---
+- name: Ensures portainer dir exists
+  file:
+    path: "{{ portainer_dir }}"
+    state: directory
+
 - name: Adding password file
   template:
     src: portainer_password.j2
-    dest: "/tmp/portainer_password"
+    dest: "{{ portainer_dir }}/portainer_password.txt"
     mode: 0600
 
 - name: Portainer
@@ -14,16 +19,16 @@
     pull: yes
     restart_policy: on-failure
     restart_retries: 2
-    command: --admin-password-file /tmp/portainer_password
+    command: '--admin-password-file /tmp/portainer_password.txt'
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
-      - "/var/portainer:/data"
-      - "/tmp/portainer_password:/tmp/portainer_password"
+      - "{{ portainer_dir }}/data:/data"
+      - "{{ portainer_dir }}/portainer_password.txt:/tmp/portainer_password.txt"
     networks:
       - name: "{{ docker_network }}"
     labels:
       traefik.docker.network: "{{ docker_network }}"
       traefik.enable: "true"
-      traefik.basic.frontend.rule: "Host:portainer.{{ route53_domian_name }}"
+      traefik.basic.frontend.rule: "Host:{{ portainer_hostname }}.{{ route53_domian_name }}"
       traefik.frontend.whiteList.sourceRange: "{{ traefik_allowed_ips }}"
       traefik.basic.port: "9000"

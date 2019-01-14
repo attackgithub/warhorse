@@ -5,6 +5,7 @@
   tags:
     - aws-sg
     - aws-sg:create
+    - destroy-all
     - aws-sg:destroy
   when: vpc_net_facts is undefined
 
@@ -16,5 +17,5 @@
 - include: destroy.yml
   tags:
     - never
-    - destroy
+    - destroy-all
     - aws-sg:destroy

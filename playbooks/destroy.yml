@@ -1,0 +1,41 @@
+---
+# playbooks/destroy.yml
+
+- name: Warning
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  tasks:
+     - pause:
+          prompt: "WARNING YOU ARE ABOUT DESTROY EVERYTHING TO INCLUDED BACKUPS -- PRESS ENTER TO CONTINUE"
+  tags:
+     - never
+     - destroy-all
+
+- name: Destroy Cloud
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  roles:     
+     - { role: aws-ec2 }
+     - { role: aws-ssh-key }
+     - { role: aws-sg }
+     - { role: aws-ami }
+     - { role: aws-vpc }
+  tags:
+    - never
+
+- name: Destroy Container Roles
+  hosts: localhost
+  connection: local
+  gather_facts: yes
+  roles:     
+    - { role: aws-inventory }
+    - { role: traefik-docker } ## This container is REQUIRED!!
+    - { role: portainer-docker }
+    - { role: backup-docker }
+    - { role: netdata-docker }
+    - { role: lair-docker }
+    - { role: cobaltstrike-docker }
+  tags:
+    - never

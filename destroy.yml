@@ -1,0 +1,4 @@
+#!/usr/bin/env ansible-playbook
+
+- name: Destroy Playbook
+  import_playbook: playbooks/destroy.yml

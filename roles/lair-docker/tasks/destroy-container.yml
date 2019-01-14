@@ -1,0 +1,17 @@
+---
+# roles/lair-docker/tasks/destroy-container.yml
+
+- name: Destroy Lair
+  docker_container:
+    name: lair
+    state: absent
+
+- name: Destroy Lair API
+  docker_container:
+    name: lairapi
+    state: absent
+
+- name: Destroy Lair Database
+  docker_container:
+    name: lairdb
+    state: absent

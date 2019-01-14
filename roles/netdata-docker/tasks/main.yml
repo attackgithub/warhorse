@@ -24,26 +24,40 @@
     - netdata-docker:create-passwords
 
 - name: Write Vault
-  include: vault-write.yml
+  include: create-vault.yml
   when: (vault_netdata_file.stat.exists == false)
   tags:
     - netdata-docker
-    - netdata-docker:vault-write
+    - netdata-docker:create-vault
 
 - name: Create DNS Entry
-  include: dns.yml
+  include: create-dns.yml
   tags:
      - netdata-docker
      - netdata-docker:dns
 
 - name: Create Continer
-  include: create.yml
+  include: create-container.yml
   tags:
      - netdata-docker
      - netdata-docker:create
 
 - name: Destroy Container
-  include: destroy.yml
+  include: destroy-container.yml
   tags:
     - never
+    - netdata-docker:destroy
+
+- name: Destroy DNS
+  include: destroy-dns.yml
+  tags:
+    - never
+    - destroy-all
+    - netdata-docker:destroy
+
+- name: Destroy vault
+  include: destroy-vault.yml
+  tags:
+    - never
+    - destroy-all
     - netdata-docker:destroy

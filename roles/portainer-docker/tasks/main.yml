@@ -21,27 +21,41 @@
     - portainer-docker
     - portainer-docker:create-passwords
 
-- name: Write Vault
-  include: vault-write.yml
+- name: Create Vault
+  include: create-vault.yml
   when: (vault_portainer_file.stat.exists == false)
   tags:
     - portainer-docker
     - portainer-docker:vault-write
 
 - name: Create DNS Entry
-  include: dns.yml
+  include: create-dns.yml
   tags:
      - portainer-docker
      - portainer-docker:dns
 
-- name: Create Continer
-  include: create.yml
+- name: Create Container
+  include: create-container.yml
   tags:
      - portainer-docker
      - portainer-docker:create
 
 - name: Destroy Container
-  include: destroy.yml
+  include: destroy-container.yml
   tags:
     - never
+    - portainer-docker:destroy
+
+- name: Destroy DNS
+  include: destroy-dns.yml
+  tags:
+    - never
+    - destroy-all
+    - portainer-docker:destroy
+
+- name: Destroy vault
+  include: destroy-vault.yml
+  tags:
+    - never
+    - destroy-all
     - portainer-docker:destroy

@@ -7,6 +7,7 @@
 
 - name: Destroy Encrypted AMI
   ec2_ami:
-    image_id: "{{ encrypted_ami.image_id }}"
+    image_id: '{{ encrypted_ami.images[0].image_id }}'
     delete_snapshot: True
     state: absent
+  when: encrypted_ami.images[0] is defined

@@ -4,10 +4,6 @@
     path: "{{ playbook_dir }}/files/ssh/ssh-key"
   register: ssh_file
 
-- name: Remove private ssh key to ssh-agent
-  shell: "ansible-vault view --vault-id {{vault_password_file}} {{ playbook_dir }}/files/ssh/ssh-key | ssh-add -d"
-  when: (ssh_file.stat.exists == true)
-
 - name: delete ec2 key pair on AWS
   ec2_key:
     name: "{{ keypair }}"
@@ -17,3 +13,4 @@
   file:
     state: absent
     path: "{{ playbook_dir }}/files/ssh/ssh-key"
+  when: (ssh_file.stat.exists == true)

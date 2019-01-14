@@ -1,0 +1,7 @@
+---
+# roles/netdata-docker/tasks/destroy-container.yml
+
+- name: Destroy Cobaltstrike
+  docker_container:
+    name: netdata
+    state: absent

@@ -9,7 +9,7 @@
     - { role: traefik-docker } ## This container is REQUIRED!!
     - { role: portainer-docker }
     - { role: watchtower-docker }
-    # - { role: backup-docker }
+    - { role: backup-docker }
     - { role: netdata-docker }
     - { role: lair-docker }
     - { role: cobaltstrike-docker }

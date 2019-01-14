@@ -33,7 +33,7 @@
     labels:
       traefik.docker.network: "{{ docker_network }}"
       traefik.enable: "true"
-      traefik.basic.frontend.rule: "Host:metrics.{{ route53_domian_name }}"
+      traefik.basic.frontend.rule: "Host:{{ netdata_hostname }}.{{ route53_domian_name }}"
       traefik.frontend.whiteList.sourceRange: "{{ traefik_allowed_ips }}"
       traefik.frontend.auth.basic.users: "{{ metrics_basicauth_user }}:{{ vault_metrics_basicauth_password | password_hash('blowfish') }}"
       traefik.basic.port: "19999"

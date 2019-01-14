@@ -17,48 +17,60 @@
   tags:
     - cobaltstrike-docker
 
-- pause:
-      prompt: "What is your Cobalt Strike License?"
-  when: (vault_cs_key is not defined )
-  register: vault_cs_key
-  no_log: true
+- meta: end_play
+  when: (vault_cs_key is not defined)
   tags:
     - cobaltstrike-docker
+    - cobaltstrike-docker:check-license
 
 - name: Create Passwords
   include: create-passwords.yml
   when: (vault_cobaltstrike_file.stat.exists == false)
   tags:
     - cobaltstrike-docker
-    - cobaltstrike-docker:create-passwords
+    - cobaltstrike-docker:passwords
 
 - name: Create Security Group
-  include: sg.yml
+  include: create-sg.yml
   tags:
     - cobaltstrike-docker
     - cobaltstrike-docker:sg
 
-- name: Write Vault
-  include: vault-write.yml
+- name: Create Vault
+  include: create-vault.yml
   when: (vault_cobaltstrike_file.stat.exists == false)
   tags:
     - cobaltstrike-docker
-    - cobaltstrike-docker:vault-write
+    - cobaltstrike-docker:vault
 
 - name: Create DNS Entry
-  include: dns.yml
+  include: create-dns.yml
   tags:
      - cobaltstrike-docker
      - cobaltstrike-docker:dns
 
 - name: Create Continer
-  include: create.yml
+  include: create-container.yml
   tags:
      - cobaltstrike-docker
-     - cobaltstrike-docker:create
+     - cobaltstrike-docker:container
 
 - name: Destroy Container
-  include: destroy.yml
+  include: destroy-container.yml
   tags:
     - never
+    - cobaltstrike-docker:destroy
+
+- name: Destroy DNS
+  include: destroy-dns.yml
+  tags:
+    - never
+    - destroy-all
+    - cobaltstrike-docker:destroy
+
+- name: Destroy vault
+  include: destroy-vault.yml
+  tags:
+    - never
+    - destroy-all
     - cobaltstrike-docker:destroy

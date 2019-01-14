@@ -1,0 +1,50 @@
+---
+# roles/backup-docker/tasks/create.yml
+
+- name: Ensures dir exists
+  file:
+    path: '{{ item }}'
+    state: directory
+  with_items:
+    - '{{ borgmatic_dir }}'
+    - '{{ borgmatic_dir }}/config'
+    - '{{ borgmatic_dir }}/borgmatic.d'
+    - '{{ borgmatic_dir }}/cache'
+    - '{{ backup_dir }}'
+    
+- name: Adding config.yml file
+  template:
+    src: config.yml.j2
+    dest: '{{ borgmatic_dir }}/config/config.yml'
+    mode: 0600
+
+- name: Adding rclone.conf file
+  template:
+    src: rclone.conf.j2
+    dest: '{{ borgmatic_dir }}/config/rclone.conf'
+    mode: 0600
+
+- name: Warhorse Backup
+  docker_container:
+    name: backup
+    image: warhorse/docker-backup:latest
+    pull: yes
+    state: started
+    hostname: backup
+    restart_policy: always
+    env:
+      BORG_PASSPHRASE: '{{ vault_borg_encrypt_password }}'
+      SYNC_SRC: "/repository"
+      SYNC_DEST: "{{ backup_dest_name }}:{{ s3_bucket_name }}{{ s3_backup_dir }}"
+      CRON: "{{ backup_cron }}"
+      FORCE_SYNC: "1"
+      CHECK_URL: ""
+      TZ: '{{ time_zone }}'
+    volumes:
+      - '{{ borgmatic_dir }}/config:/config'
+      - '{{ borgmatic_dir }}/borgmatic.d:/etc/borgmatic.d'
+      - '{{ borgmatic_dir }}/cache:/cache'
+      - '{{backup_dir}}:/repository'
+      - '{{docker_home_dir}}:/source/docker'
+    networks:
+      - name: '{{ docker_network }}'

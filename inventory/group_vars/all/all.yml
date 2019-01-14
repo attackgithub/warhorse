@@ -1,11 +1,13 @@
 ---
 # vars/all.yml
 
-allowed_ips: '1.1.1.1/32'
+allowed_ips: '0.0.0.0/32'
 
 vault_password_file: ~/.vault_pass
 vault_force_new_password: false
 ansible_user: ubuntu
+
+time_zone: 'US/Eastern'
 
 ##
 # General Playbook
@@ -14,6 +16,7 @@ ansible_user: ubuntu
 hostname: 'warhorse-box'
 modify_containers_only: false
 cloud_provider: 'aws'
+docker_home_dir: '/opt/docker'
 
 ##
 # EC2 Specific variables
@@ -50,7 +53,7 @@ private_subnet_2_cidr: "10.0.11.0/24"
 # Route53 Specific variables
 ##
 
-route53_domian_name: 'yourdomain.com'
+route53_domian_name: 'mydomain.com'
 
 ##
 # Docker Specific variables
@@ -60,10 +63,10 @@ docker_network: 'attack'
 ##
 # Traefik Specific variables
 ##
-traefik_dir: '/var/www/traefik'
+traefik_dir: '{{docker_home_dir}}/traefik'
 traefik_tls_src_files: './files'
 traefik_user: 'admin'
-traefik_lets_encypt_email: 'my@email.com'
+traefik_lets_encypt_email: 'ralph@thedarkcloud.net'
 traefik_allowed_ips: '{{allowed_ips}}'
 traefik_hostname: 'traefik'
 
@@ -78,14 +81,26 @@ metrics_basicauth_user: 'admin'
 netdata_hostname: 'netdata'
 
 # lair
-lair_dir: '/etc/lair'
+lair_dir: '{{docker_home_dir}}/lair'
 lair_hostname: 'lair'
 
 #Cobalt Strike
 cs_hostname: 'cs'
-cs_dir: '/etc/cobaltstrike'
+cs_dir: '{{docker_home_dir}}/cobaltstrike'
 cs_profile: 'malleable'
 cs_exp_date: '2019-12-12'
 
 # Portainer
 portainer_hostname: 'portainer'
+portainer_dir: '{{docker_home_dir}}/portainer'
+
+
+#Backup
+borgmatic_dir: '/opt/borgmatic'
+backup_dir: '/opt/backup'
+backup_cron: '0 1 * * *'
+backup_dest_type: 's3'
+backup_dest_name: 's3'
+backup_provider: 'AWS'
+s3_bucket_name: '{{hostname}}-bucket'
+s3_backup_dir: '/backup'

@@ -1,0 +1,20 @@
+---
+# roles/backup-docker/tasks/destroy-iam.yml
+- name: Remove dnsChallenge policy
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  iam_managed_policy:
+    policy_name: "dnsChallenge"
+    state: absent
+
+- name: Delete IAM users
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  iam:
+    iam_type: user
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - dnsChallenge_user

@@ -1,0 +1,9 @@
+---
+# roles/backup-docker/tasks/destroy-s3.yml
+- name: Remove S3 bucket
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  aws_s3:
+    bucket: '{{ s3_bucket_name }}'
+    mode: delete

@@ -1,0 +1,15 @@
+---
+# roles/cobaltstrike-docker/tasks/destroy-container.yml
+
+- name: Destroy cobaltstrike dir exists
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+  - '{{ cs_dir }}'
+  - '{{ cs_dir }}/profiles'
+
+- name: Destroy Cobaltstrike
+  docker_container:
+    name: cobaltstrike
+    state: absent

@@ -5,9 +5,8 @@
   delegate_facts: True
   ec2_vpc_net_facts:
     filters:
-      "tag:Name": "{{hostname}}-vpc"
+      "tag:Name": "{{ hostname }}-vpc"
   register: vpc_net_facts
-  when: vpc_net_facts is not defined
 
 - name: AWS Security Group for Traefik
   delegate_to: localhost

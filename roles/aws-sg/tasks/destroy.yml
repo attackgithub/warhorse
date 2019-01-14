@@ -2,12 +2,13 @@
 # tasks file for aws-sg
 
 - name: Destroy security groups
-  delegate_to: 127.0.0.1
+  delegate_to: localhost
   become: no
   delegate_facts: True
   ec2_group:
-    name: "{{ item.key }}"
-    description: "Security group for the {{ item.key }}"
-    state: "{{ state }}"
-    region: "{{ item.value.aws_region | default('us-east-2') }}"
-  with_dict: "{{ sg_settings }}"
+    name: "{{ security_group_name }}"
+    description: "Security group for the {{ security_group_name }}"
+    vpc_id: "{{ vpc_net_facts.vpcs[0].id }}"
+    region: "{{ aws_region }}"
+    state: "absent"
+  when: vpc_net_facts.vpcs[0] is defined

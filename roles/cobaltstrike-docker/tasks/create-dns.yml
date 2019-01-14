@@ -1,4 +1,6 @@
 ---
+# roles/cobaltstrike-docker/tasks/create-dns.yml
+
 - name: Add DNS Records
   delegate_to: 127.0.0.1
   become: no

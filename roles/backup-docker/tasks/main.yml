@@ -22,29 +22,56 @@
   when: (vault_backup_file.stat.exists == false)
   tags:
     - backup-docker
-    - backup-docker:create-passwords
+    - backup-docker:passwords
 
-- name: Creat IAM accounts
-  include: iam.yml
+- name: Create IAM accounts
+  include: create-iam.yml
   tags:
     - backup-docker
     - backup-docker:iam
 
-- name: Write Vault
-  include: vault-write.yml
+- name: Create Vault
+  include: create-vault.yml
   when: (vault_backup_file.stat.exists == false)
   tags:
     - backup-docker
     - backup-docker:vault-write
 
-- name: Create Continer
-  include: create.yml
+- name: Create S3 Bucket
+  include: create-s3.yml
   tags:
      - backup-docker
-     - backup-docker:create
+     - backup-docker:s3-bucket
+
+- name: Create Continer
+  include: create-container.yml
+  tags:
+     - backup-docker
+     - backup-docker:container
 
 - name: Destroy Container
-  include: destroy.yml
+  include: destroy-container.yml
   tags:
     - never
+    - backup-docker:destroy
+
+- name: Destroy IAM
+  include: destroy-iam.yml
+  tags:
+    - never
+    - destroy-all
+    - backup-docker:destroy
+ 
+- name: Destroy S3
+  include: destroy-s3.yml
+  tags:
+    - never
+    - destroy-all
+    - backup-docker:destroy
+
+- name: Destroy vault
+  include: destroy-vault.yml
+  tags:
+    - never
+    - destroy-all
     - backup-docker:destroy

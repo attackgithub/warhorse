@@ -8,5 +8,5 @@
 - include: destroy.yml
   tags:
     - never
-    - destroy
+    - destroy-all
     - aws-vpc:destroy

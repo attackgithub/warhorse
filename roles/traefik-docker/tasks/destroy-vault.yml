@@ -1,0 +1,10 @@
+---
+# roles/traefik-docker/tasks/destroy-vault.yml
+
+- name: Destroy Vault 
+  delegate_to: localhost
+  become: no
+  delegate_facts: True
+  file:
+    state: absent
+    path: "{{ role_path }}/vars/vault.yml"

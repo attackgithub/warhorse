@@ -1,13 +1,14 @@
 ---
+# roles/cobaltstrike-docker/tasks/create-sg.yml
+
 - name: Gather VPC NET Facts
   delegate_to: 127.0.0.1
   become: no
   delegate_facts: True
   ec2_vpc_net_facts:
     filters:
-      "tag:Name": "{{hostname}}-vpc"
+      "tag:Name": "{{ hostname }}-vpc"
   register: vpc_net_facts
-  when: vpc_net_facts is not defined
 
 - name: AWS Security Group for Cobalt Strike
   delegate_to: localhost

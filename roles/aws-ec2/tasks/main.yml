@@ -13,5 +13,5 @@
 - include: destroy.yml
   tags:
     - never
-    - destroy
+    - destroy-all
     - aws-ec2:destroy

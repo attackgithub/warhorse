@@ -1,0 +1,33 @@
+---
+# roles/lair-docker/tasks/destroy-dns.yml
+
+- name: Get Public IP
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  route53:
+      state: get
+      zone: '{{ item.zone }}'
+      record: '{{ item.record }}'
+      type: A
+  with_items:
+    - zone: '{{ route53_domian_name }}'
+      record: '{{ lair_hostname }}.{{ route53_domian_name }}'
+  register: rec
+
+- name: Destroy DNS Records
+  delegate_to: 127.0.0.1
+  become: no
+  delegate_facts: True
+  route53:
+      state: absent
+      zone: "{{ item.zone }}"
+      record: "{{ item.record }}"
+      type: A
+      ttl: 7200
+      value: "{{ item.value}}"
+  with_items:
+    - zone: '{{ route53_domian_name }}'
+      record: '{{ lair_hostname }}.{{ route53_domian_name }}'
+      value: '{{ rec.results[0].set.value }}'
+  when: rec.results[0].set.value is defined

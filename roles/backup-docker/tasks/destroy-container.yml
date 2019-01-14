@@ -1,0 +1,18 @@
+---
+# roles/backup-docker/tasks/destroy-container.yml
+
+- name: Remove Warhorse Backup
+  docker_container:
+    name: backup
+    state: absent
+
+- name: Remove dir's
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - '{{ borgmatic_dir }}'
+    - '{{ borgmatic_dir }}/config'
+    - '{{ borgmatic_dir }}/borgmatic.d'
+    - '{{ borgmatic_dir }}/cache'
+    - '{{ backup_dir }}'

@@ -1,6 +1,5 @@
 # Warhorse - Red Team Attack Infrastructure Automation
 
-
 ## CURRENT STATUS - BETA
 
 
@@ -20,7 +19,7 @@ Warhorse consist of a fully featured Ansible playbook to deploy infrastructure i
 
 ## Features
 
-* Pure Ansible playbook with low dependences and easy modification.
+* Pure Ansible playbook with low dependencies and easy modification.
 * Cloud provider support (AWS)
 * Security from the ground up
 	- White listed IP for management interfaces
@@ -32,7 +31,7 @@ Warhorse consist of a fully featured Ansible playbook to deploy infrastructure i
 * Docker containers for each application. Avoids dependence issues and allows for the creation management and removal of complex software stacks.
 * Low cost operation with single ec2 host.
 * Easily add and remove docker containers to create a stack that fits your engagement
-* Bottom up build everything is created and removed on damand
+* Bottom up build everything is created and removed on-demand
 
 
 ## Containers
@@ -42,8 +41,9 @@ Warhorse consist of a fully featured Ansible playbook to deploy infrastructure i
 * Netdata
 * Lair
 * Watchtower
+* Backup (Borg/rclone to S3)
 * Grafana (Coming Soon)
-* Backup (Borg/rclone) (Coming Soon)
+
 
 ### Command And Control
 * Cobalt Strike
@@ -98,16 +98,43 @@ chmod 400 ~/.vault_pass
 
 ## Usage
 
+BUILD TIME AROUND 10min
+
+
 To launch the infrastructure, use the following command.
 
 ```bash
-$ ansible-playbook -i inventory/hosts site.yml --vault-password-file ~/.vault_pass
+$ ansible-playbook -i inventory/hosts create.yml --vault-password-file ~/.vault_pass
+
 ```
 
+To use with Cobalt strike you must provided a Cobalt strike key. This key is only required during the first build. If you do not provided a key Cobalt strike will not build.
+
+```bash
+ansible-playbook -i inventory/hosts create.yml --vault-password-file ~/.vault_pass --extra-vars "vault_cs_key=0000-0000-0000-0000"
+```
+
+If you would like to modify only one container for example cobaltstrike-docker you can use tags to save time running checks that are not needed
+
+```bash
+ansible-playbook -i inventory/hosts create.yml --vault-password-file ~/.vault_pass -t cobaltstrike-docker
+```
+
+To destroy your entire setup to included backups run the following command.
+
+```bash
+ansible-playbook -i inventory/hosts destroy.yml --vault-password-file ~/.vault_pass --tags destroy-all
+```
+
+To just remove for example cobaltstrike-docker you could run the following
+
+```bash
+ansible-playbook -i inventory/hosts destroy.yml --vault-password-file ~/.vault_pass --tags cobaltstrike-docker
+```
 
 ## What's Next?
 
-This project is rapidly evolving. I have plans to continue active devlopment and will utlize during my own engagments and modify and impove when necessary. I will be created better documentation as this project stabilizes. This playbook may not work at all feel free to make push request. 
+This project is rapidly evolving. I have plans to continue active development and will utilize during my own engagements and modify and improve when necessary. I will be created better documentation as this project stabilizes. This playbook may not work at all feel free to make push request. 
     
 
 ## Dependencies

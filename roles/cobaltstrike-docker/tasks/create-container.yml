@@ -1,13 +1,14 @@
 ---
-- name: Ensures cobaltstrike dir exists
-  file:
-    path: "{{ cs_dir }}"
-    state: directory
+# roles/cobaltstrike-docker/tasks/create-container.yml
 
 - name: Ensures cobaltstrike dir exists
   file:
-    path: "{{ cs_dir }}/profiles"
+    path: '{{ item }}'
     state: directory
+  with_items:
+  - '{{ cs_dir }}'
+  - '{{ cs_dir }}/profiles'
+
 
 - name: Adding profile file
   template:

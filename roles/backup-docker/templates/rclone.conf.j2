@@ -1,0 +1,12 @@
+[{{ backup_dest_name }}]
+type = {{ backup_dest_type }}
+provider = {{ backup_provider }}
+env_auth = false
+access_key_id = {{ vault_s3backup_user_access_key_id }}
+secret_access_key = {{ vault_s3backup_user_secret_access_key }}
+region = {{ aws_region }}
+endpoint = 
+location_constraint = 
+acl = private
+server_side_encryption = 
+storage_class = 

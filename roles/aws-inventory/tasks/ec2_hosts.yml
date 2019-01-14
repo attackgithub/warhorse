@@ -18,3 +18,5 @@
     name: "{{ current_instance.instances[0].public_dns_name }}"
     groups: "{{ hostname }}"
     ec2_id: "{{ current_instance.instances[0].instance_id }}"
+  register: ec2_host
+  when:  current_instance.instances[0] is defined
