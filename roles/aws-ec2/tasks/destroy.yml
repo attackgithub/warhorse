@@ -1,6 +1,6 @@
 ---
 # roles/aws-ec2/tasks/destroy.ym
-- name: Gather hosts matching tags. This is important.
+- name: Gather hosts matching tags.
   ec2_instance_facts:
     filters:
       instance-state-name: running
@@ -14,4 +14,5 @@
     state: 'absent'
     instance_ids: '{{ current_instance.instances[0].instance_id }}'
     region: "{{ aws_region }}"
+    wait: True
   when: 'current_instance.instances[0] is defined'

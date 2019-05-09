@@ -1,5 +1,6 @@
 ---
 # roles/aws-ec2/tasks/create.yml
+
 - name: Start the EC2 instance
   ec2:
     region: "{{ aws_region }}"
